@@ -118,17 +118,17 @@ describe('ProfessorService', () => {
   // it('findOne => should find a user by a given id and return its data', async () => {
   //   // arrange
   //   const id = 1;
-    const professor = {
-      id: 1,
-      name: 'Rodrigo Miani',
-      sex: 'Masculino',
-      email: 'miani@ufu.br',
-      photoPath: 'caminho-do-bucket-para-foto',
-      description: `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
-      mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
-      e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`,
-      facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani'
-    };
+    // const professor = {
+    //   id: 1,
+    //   name: 'Rodrigo Miani',
+    //   sex: 'Masculino',
+    //   email: 'miani@ufu.br',
+    //   photoPath: 'caminho-do-bucket-para-foto',
+    //   description: `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
+    //   mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
+    //   e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`,
+    //   facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani'
+    // };
   //   jest.spyOn(mockProfessorRepository, 'findOne').mockReturnValue(professor);
 
   //   // act

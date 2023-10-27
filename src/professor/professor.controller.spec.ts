@@ -74,18 +74,4 @@ describe('ProfessorController', () => {
     expect(result).toEqual(mockBaseRequestCreatedResult);
 
   });
-
-  // it('should update a professor', () => {
-  //   const updateProfessorDto = {
-  //     name: 'Gustavo',
-  //     sex: 'Masculino',
-  //     email:'gustavo@teste.com',
-  //     photoPath: 'teste-de-url',
-  //     description: 'descrição',
-  //     facomPageUrl:'teste-de-url-da-facom'
-  //   };
-
-  //   expect.contro
-  // });
-
 });

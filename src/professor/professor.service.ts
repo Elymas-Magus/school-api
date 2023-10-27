@@ -19,16 +19,14 @@ export class ProfessorsService {
     if (professor != null)
       throw new HttpException(`Professor with email ${email} already exists`, HttpStatus.BAD_REQUEST);
 
-    const newProfessor = new Professor();
-    
-    newProfessor.name = createProfessorDto.name;
-	newProfessor.sex = createProfessorDto.sex;
-    newProfessor.email = createProfessorDto.email;
-    newProfessor.photoPath = createProfessorDto.photoPath;
-    newProfessor.description = createProfessorDto.description;
-    newProfessor.facomPageUrl = createProfessorDto.facomPageUrl;
-    
-    this.professorRepo.create(newProfessor);
+    const newProfessor = this.professorRepo.create({
+      name: createProfessorDto.name,
+      sex: createProfessorDto.sex,
+      email: createProfessorDto.email,
+      photoPath: createProfessorDto.photoPath,
+      description: createProfessorDto.description,
+      facomPageUrl: createProfessorDto.facomPageUrl
+    })
     this.professorRepo.save(newProfessor);
     
     return newProfessor;
@@ -36,6 +34,12 @@ export class ProfessorsService {
 
   async list(): Promise<Professor[]> {
     return this.professorRepo.find();
+  }
+
+  async findOne(id: number) {
+    return await this.professorRepo.findOne({
+      where: {id}
+    });
   }
 
   async update(
@@ -50,8 +54,8 @@ export class ProfessorsService {
 
       if (professor == null) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
       
-      professor.name = UpdateProfessorDto.name;
-	  professor.sex = updateProfessorDto.sex;
+      professor.name = updateProfessorDto.name;
+	    professor.sex = updateProfessorDto.sex;
       professor.description = updateProfessorDto.description;
       professor.facomPageUrl = updateProfessorDto.facomPageUrl;
       professor.photoPath = updateProfessorDto.photoPath;
@@ -69,7 +73,7 @@ export class ProfessorsService {
     if (professor == null) throw new HttpException("Professor not found", HttpStatus.NOT_FOUND);
     
     this.professorRepo.delete(professor);
-    this.professorRepo.save(professor);
+    // this.professorRepo.save(professor);
     return `Deleted Successfully`;
   }
 }

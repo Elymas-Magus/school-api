@@ -1,22 +1,17 @@
 version: '3.9'
 
 services:
-       
-      
-  postgres:
-    image: postgres
-    container_name: pdsi-project
-    restart: always
+  MySql:
+    image: mysql:latest
+    container_name: pdsi-school
     environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: pdsi-1234
-      POSTGRES_DB: pdsi-project-db
+      MYSQL_ROOT_PASSWORD: pdsi1234
+      MYSQL_DATABASE: school
     ports:
-      - "5432:5432"
+      - '3306:3306'
     volumes:
-      - postgres-volume:/var/lib/postgresql/data 
-    
+      - mysql-data:/var/lib/mysql
 
 volumes:
-    postgres-volume:
-        driver: local
+  mysql-data:
+    driver: local

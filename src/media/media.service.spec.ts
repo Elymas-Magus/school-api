@@ -1,10 +1,15 @@
+import { BaseListiningRequestResult } from "@app/common/BaseModels/base-listining-request-result.dto";
+import { BaseListiningRequest } from "@app/common/BaseModels/base-listining-request.dto";
 import { Resource } from "@app/resources/entities/resource.entity";
 import { UploadS3Service } from "@app/s3/s3Bucket.service";
+import { HttpException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { S3 } from "aws-sdk";
+import { DeleteResult } from "typeorm";
 import { ResourcesService } from "../resources/resources.service";
 import { CreateMediaDto } from "./dto/create-media.dto";
+import { MediaFilter } from "./dto/media-filter.dto";
 import { Media } from "./entities/media.entity";
 import { MediaRepository } from "./media.repository";
 import { MediaService } from "./media.service";
@@ -21,6 +26,8 @@ describe("MediaService", () => {
     save: jest.fn(),
     findOne: jest.fn(),
     find: jest.fn(),
+    delete: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
 
   const uploadS3Service = {
@@ -80,6 +87,17 @@ describe("MediaService", () => {
     //Assert
     expect(mediaRepository.findOne).toBeCalled();
     expect(result).toEqual(mediaExpected);
+  });
+
+  it("findOne => Find media failed", async () => {
+    //Arrange
+    jest.spyOn(mediaRepository, "findOne").mockReturnValue(null);
+
+    //Act
+    //Assert
+    await expect(mediaService.findOne(1)).rejects.toThrowError(
+      new HttpException("Media not found", 404)
+    );
   });
 
   it("findAll => Should return a Media", async () => {
@@ -186,5 +204,127 @@ describe("MediaService", () => {
       model_id: createMediaDto.model_id,
       resource: resource,
     });
+  });
+
+  it("remove => Should delete a Media", async () => {
+    //Arrange
+    const mediaExpected: Media = {
+      id: 1,
+      model_id: 1,
+      model_type: "resource",
+      collection_name: "teste",
+      metadata: "{prop: value}",
+      filename: "arquivo-teste.jpg",
+      mime_type: "image",
+      disk: "aws-s2.school.cloud/teste/arquivo-teste.jpg",
+      size: 222,
+      url: "www.url.com.br/teste",
+      createdAt: new Date(),
+      deletedAt: null,
+      updatedAt: null,
+      resource: null,
+    };
+
+    jest.spyOn(mediaRepository, "findOne").mockReturnValue(mediaExpected);
+
+    mediaExpected.deletedAt = new Date();
+
+    jest
+      .spyOn(mediaRepository, "delete")
+      .mockReturnValue(expect.any(DeleteResult));
+    jest.spyOn(mediaRepository, "save").mockReturnValue(mediaExpected);
+
+    //Act
+    const result = await mediaService.remove(1);
+
+    //Assert
+    expect(mediaRepository.findOne).toBeCalled();
+    expect(result).toEqual("Deleted successfully");
+  });
+
+  it("remove => Delete media failed", async () => {
+    //Arrange
+    jest.spyOn(mediaRepository, "findOne").mockReturnValue(null);
+
+    //Act
+    //Assert
+    await expect(mediaService.remove(1)).rejects.toThrowError(
+      new HttpException("Media not found", 404)
+    );
+  });
+
+  it("should return paginated media list without filters", async () => {
+    const params: BaseListiningRequest<MediaFilter> = {
+      orderBy: "id",
+      orderDirection: "ASC",
+      page: 1,
+      per_page: 10,
+      filters: null,
+    };
+
+    const mockMediaList = [new Media(), new Media()];
+
+    jest.spyOn(mediaRepository, "createQueryBuilder").mockReturnValueOnce({
+      where: jest.fn().mockReturnThis(),
+      leftJoin: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getCount: jest.fn().mockResolvedValueOnce(mockMediaList.length),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValueOnce(mockMediaList),
+    } as any);
+
+    const result = await mediaService.findAllPaginated(params);
+
+    expect(result).toBeInstanceOf(BaseListiningRequestResult);
+    expect(result.data).toEqual(mockMediaList);
+    expect(result.page).toBe(params.page);
+    expect(result.per_page).toBe(params.per_page);
+    expect(result.num_pages).toBe(
+      Math.ceil(mockMediaList.length / params.per_page)
+    );
+    expect(result.next_page).toBe(false);
+    expect(result.prev_page).toBe(false);
+  });
+
+  it("should return paginated media list with filters", async () => {
+    const params: BaseListiningRequest<MediaFilter> = {
+      orderBy: "id",
+      orderDirection: "ASC",
+      page: 1,
+      per_page: 10,
+      filters: {
+        model_type: "resource",
+        collection_name: "teste",
+        creatorId: 1,
+        filename: "teste.png",
+        metadata: "{'prop': 'value'}",
+        resourceId: 1,
+      },
+    };
+
+    const mockMediaList = [new Media(), new Media()];
+
+    jest.spyOn(mediaRepository, "createQueryBuilder").mockReturnValueOnce({
+      where: jest.fn().mockReturnThis(),
+      leftJoin: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getCount: jest.fn().mockResolvedValueOnce(mockMediaList.length),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValueOnce(mockMediaList),
+    } as any);
+
+    const result = await mediaService.findAllPaginated(params);
+
+    expect(result).toBeInstanceOf(BaseListiningRequestResult);
+    expect(result.data).toEqual(mockMediaList);
+    expect(result.page).toBe(params.page);
+    expect(result.per_page).toBe(params.per_page);
+    expect(result.num_pages).toBe(
+      Math.ceil(mockMediaList.length / params.per_page)
+    );
+    expect(result.next_page).toBe(false);
+    expect(result.prev_page).toBe(false);
   });
 });

@@ -1,14 +1,14 @@
 import { ModelHasRole } from "@app/model_has_roles/entities/model_has_role.entity";
 import { Resource } from "@app/resources/entities/resource.entity";
 import {
-  Entity,
   Column,
-  OneToMany,
-  JoinColumn,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 
 @Entity({ name: "user" })

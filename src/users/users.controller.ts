@@ -48,7 +48,6 @@ export class UsersController {
         BaseRequestMessages.Found,
         result
       );
-      console.log({ response });
       return response;
     } catch (e) {
       return e;

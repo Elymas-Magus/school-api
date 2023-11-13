@@ -40,9 +40,6 @@ export class MediaService {
 
     const uploadResult = await this.uploadMediaToS3(media);
 
-    console.log(uploadResult.Location);
-    // media.disk = uploadResult.Location;
-
     this.mediaRepository.create(media);
     this.mediaRepository.save(media);
 

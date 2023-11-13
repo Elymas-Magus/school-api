@@ -13,7 +13,7 @@ describe('ProfessorController', () => {
 
   const mockProfessorsService = {
     create: jest.fn(),
-    findll: jest.fn(),
+    list: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
@@ -74,4 +74,59 @@ describe('ProfessorController', () => {
     expect(result).toEqual(mockBaseRequestCreatedResult);
 
   });
+
+  it("list => shoud list all professors in the database", async () => {
+    // arrange
+    const professors = [{
+      id: 1,
+      name: 'Pedro Frosi Rosa',
+      sex: 'Masculino',
+      email: 'pfrosi@ufu.br',
+      photoPath: 'caminho-do-bucket-para-foto',
+      description: `Possui mestrado em Engenharia de Computação pela Escola Politécnica da Universidade de São Paulo (1990) 
+      na área de Arquitetura de Redes de Computadores e doutorado em Engenharia de Computação por um acordo de cooperação 
+      internacional entre Escola Politécnica da Universidade de São Paulo e o Centre National de la Recherche Scientifique 
+      (CNRS-France 1995) na área de sistemas distribuídos no Laboratoire d'Analyse et d'Architecture des Systemes (LAAS)/Toulouse.`,
+      facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/pedro-frosi-rosa',
+    }] as Professor[];
+
+    const mockBaseRequestFoundResult = {
+      status_code: HttpStatus.OK,
+      message: BaseRequestMessages.Found,
+      data: professors,
+    } as BaseRequestResult;
+
+    jest.spyOn(mockProfessorsService, 'list').mockReturnValue(professors);
+
+    //act 
+    const result = await professorController.list();
+
+    // assert 
+    expect(mockProfessorsService.list).toBeCalled();
+    expect(result).toEqual(mockBaseRequestFoundResult);
+  });
+
+  it("remove => should delete a professor", async () => {
+    // arrange 
+    const professorId = "1";
+
+
+
+    const mockBaseRequestDeletedResult = {
+      status_code: HttpStatus.OK,
+      message: BaseRequestMessages.Deleted,
+      data: null,
+    } as BaseRequestResult;
+
+    jest.spyOn(mockProfessorsService, 'remove').mockReturnValue("Deleted Successfully");
+
+    // act
+    const result = await professorController.remove(professorId);
+
+    // assert
+    expect(mockProfessorsService.remove).toBeCalled();
+    expect(mockProfessorsService.remove).toBeCalledWith(Number(professorId));
+    expect(result).toEqual(mockBaseRequestDeletedResult);
+  });
+
 });

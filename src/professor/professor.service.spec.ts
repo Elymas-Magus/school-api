@@ -6,6 +6,7 @@ import { ProfessorRepository } from './professor.repository';
 import { CreateProfessorDto } from './dto/create-professor.dto';
 import { UpdateProfessorDto } from './dto/update-professor.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import exp from 'constants';
 
 describe('ProfessorService', () => {
   let service: ProfessorsService;
@@ -89,7 +90,7 @@ describe('ProfessorService', () => {
       expect(err.message).toContain(`Professor with email ${createProfessorDto.email} already exists`);
       
     }
-  })
+  });
 
   it('findAll => should return an array of professor', async () => {
     // arrange
@@ -109,121 +110,39 @@ describe('ProfessorService', () => {
     const result = await service.list();
 
     // assert
-    expect(result).toEqual(professors);
+    
     expect(mockProfessorRepository.find).toBeCalled();
-
+    expect(result).toEqual(professors);
   });
 
   
-  // it('findOne => should find a user by a given id and return its data', async () => {
-  //   // arrange
-  //   const id = 1;
-    // const professor = {
-    //   id: 1,
-    //   name: 'Rodrigo Miani',
-    //   sex: 'Masculino',
-    //   email: 'miani@ufu.br',
-    //   photoPath: 'caminho-do-bucket-para-foto',
-    //   description: `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
-    //   mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
-    //   e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`,
-    //   facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani'
-    // };
-  //   jest.spyOn(mockProfessorRepository, 'findOne').mockReturnValue(professor);
+  it('remove => should find a professor by a given id and then remove it', async () => {
+    // arrange
+    const professorId = 1;
+    const professor = {
+      id: 1,
+      name: 'Pedro Frosi Rosa',
+      sex: 'Masculino',
+      email: 'pfrosi@ufu.br',
+      photoPath: 'caminho-do-bucket-para-foto',
+      description: `Possui mestrado em Engenharia de Computação pela Escola Politécnica da Universidade de São Paulo (1990) 
+      na área de Arquitetura de Redes de Computadores e doutorado em Engenharia de Computação por um acordo de cooperação 
+      internacional entre Escola Politécnica da Universidade de São Paulo e o Centre National de la Recherche Scientifique 
+      (CNRS-France 1995) na área de sistemas distribuídos no Laboratoire d'Analyse et d'Architecture des Systemes (LAAS)/Toulouse.`,
+      facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/pedro-frosi-rosa',
+    } as Professor;
 
-  //   // act
-  //   const result = await service.findOne(id);
+    jest.spyOn(mockProfessorRepository, 'findOne').mockReturnValue(professor);
 
-  //   // assert
-  //   expect(result).toEqual(professor);
-  //   expect(mockProfessorRepository.findOne).toBeCalled();
-  //   expect(mockProfessorRepository.findOne).toBeCalledWith({where: {id}});
-  // });
+    //act
+    const result = await service.remove(professorId);
 
+    // assert
+    expect(mockProfessorRepository.findOne).toBeCalled();
+    expect(mockProfessorRepository.delete).toBeCalled();
+    expect(mockProfessorRepository.delete).toBeCalledWith(professor);
+    expect(result).toEqual("Deleted Successfully");
 
-  // it('update => should find a user by a given id and update its data', async () => {
-  //   // arrange
-  //   const id = 1;
-  //   // const professor = {
-  //   //   id: 1,
-  //   //   name: 'Rodrigo Miani',
-  //   //   sex: 'Masculino',
-  //   //   email: 'miani@ufu.br',
-  //   //   photoPath: 'caminho-do-bucket-para-foto',
-  //   //   description: `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
-  //   //   mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
-  //   //   e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`,
-  //   //   facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani'
-  //   // } as Professor;
-  //   const professor = new Professor();
-  //   professor.id = 1;
-  //   professor.name = "Rodrigo Miani";
-  //   professor.sex = "Masculino";
-  //   professor.email = "miani@ufu.br";
-  //   professor.photoPath = "caminho-da-foto-do-bucket";
-  //   professor.description = `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
-  //   mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
-  //   e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`;
-  //   professor.facomPageUrl = "https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani";
-
-  //   // const updateProfessorDto = {
-  //   //   name: 'Rodrigo Miani',
-  //   //   sex: 'Masculino',
-  //   //   email: 'miani@ufu.br',
-  //   //   photoPath: 'caminho-do-bucket-para-foto',
-  //   //   description: `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
-  //   //   mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
-  //   //   e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`,
-  //   //   facomPageUrl: 'https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani'
-  //   // } as UpdateProfessorDto;
-  //   const updateProfessorDto = new UpdateProfessorDto();
-  //   updateProfessorDto.name = "Rodrigo Miani";
-  //   updateProfessorDto.sex = "Masculino";
-  //   updateProfessorDto.email = "miani@ufu.br";
-  //   updateProfessorDto.photoPath = "caminho-da-foto-do-bucket";
-  //   updateProfessorDto.description = `Possui graduação em Matemática pela Universidade Federal de São Carlos (2005),
-  //   mestrado em Engenharia Elétrica pela Universidade Estadual de Campinas (2009) 
-  //   e doutorado em Engenharia Elétrica pela Universidade Estadual de Campinas (2013).`;
-  //   updateProfessorDto.facomPageUrl = "https://facom.ufu.br/pessoas/docentes/rodrigo-sanches-miani";
-    
-
-  //   // jest.spyOn(mockProfessorRepository, 'findOne').mockReturnValue(professor);
-  //   jest.spyOn(mockProfessorRepository, 'update').mockReturnValue(professor);
-
-  //   // act
-  //   // const result = await service.findOne(id);
-  //   const result = await service.update(id, updateProfessorDto);
-
-  //   // assert 
-  //   expect(result).toEqual(professor);
-  //   expect(mockProfessorRepository.update).toBeCalled();
-  //   // expect(mockProfessorRepository.update).toBeCalledWith(professor);
-
-  // });
-  // it('remove => should find a professor by a given id and the remove ', async () => {
-  //   // arrange
-  //   const id: number = 1;
-  //   const professor: Professor = {
-  //     id: 1,
-  //     name: 'Gustavo',
-  //     sex: 'Masculino',
-  //     email: 'gustavo@teste.com',
-  //     photoPath: 'teste-de-url',
-  //     description: 'descrição 2',
-  //     facomPageUrl: 'teste-de-url-da-facom',
-  //   };
-  //   jest.spyOn(mockProfessorRepository, 'delete').mockReturnValue(professor);
-
-  //   //act
-  //   const result = await service.remove(id);
-  //   if (result == null) {
-  //     console.log("Teste falhou");
-  //   }
-
-  //   expect(result).toEqual(professor);
-  //   expect(mockProfessorRepository.delete).toBeCalled();
-  //   expect(mockProfessorRepository.delete).toBeCalledWith(id);
-
-  // });
+  });
 
 });

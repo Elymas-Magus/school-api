@@ -1,6 +1,7 @@
 import { BaseRequestMessages } from "@app/common/BaseModels/BaseEnums/base-request-messages.enum";
 import { BaseListiningRequestResult } from "@app/common/BaseModels/base-listining-request-result.dto";
 import { BaseListiningRequest } from "@app/common/BaseModels/base-listining-request.dto";
+import { CreateMediaDto } from "@app/media/dto/create-media.dto";
 import { MediaService } from "@app/media/media.service";
 import { SubjectService } from "@app/subject/subject.service";
 import { UsersService } from "@app/users/users.service";
@@ -17,7 +18,6 @@ import { ResourceFilter } from "./dto/resource-filter.dto";
 import { UpdateResourceDto } from "./dto/update-resource.dto";
 import { Resource } from "./entities/resource.entity";
 import { ResourceRepository } from "./resources.repository";
-import { CreateMediaDto } from "@app/media/dto/create-media.dto";
 // import { User } from "@app/users/entities/user.entity";
 @Injectable()
 export class ResourcesService {
@@ -138,14 +138,16 @@ export class ResourcesService {
       where: { id },
       relations: ["subject", "media"],
     });
+
+    if (resource == null) {
+      throw new HttpException("Resource not found", HttpStatus.NOT_FOUND);
+    }
+
     resource.media.map((media) => {
       if (media.disk == "s3") {
         media.url = this.mediaService.gets3MediaUrl(media);
       }
     });
-    if (resource == null) {
-      throw new HttpException("Resource not found", HttpStatus.NOT_FOUND);
-    }
 
     return resource;
   }
@@ -158,6 +160,10 @@ export class ResourcesService {
       where: { id },
       relations: ["subject", "media"],
     });
+
+    if (resource == null) {
+      throw new HttpException("Resource not found", HttpStatus.NOT_FOUND);
+    }
 
     (resource.description = updateResourceDto.description),
       (resource.title = updateResourceDto.title);

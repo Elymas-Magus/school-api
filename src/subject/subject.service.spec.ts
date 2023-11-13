@@ -183,14 +183,21 @@ describe("SubjectService", () => {
 
   it("findGroupedByPeriod => should return list of subjects by period", async () => {
     //Arrange
-    const dataMockResult = createSubjectListMock(10);
+    const dataMockResult = createSubjectListMock(4);
+    dataMockResult[0].period = 1;
+    dataMockResult[1].period = 1;
+    dataMockResult[2].period = 3;
+    dataMockResult[3].period = 3;
 
     const subjectByPeriodList: Array<ListSubjectsByPeriod> = [];
 
-    for (let i = 1; i < faker.number.int({ min: 6, max: 11 }); i++) {
-      const subjectTemp = createSubjectListMock(2);
-      subjectByPeriodList.push(new ListSubjectsByPeriod(i, subjectTemp));
-    }
+    subjectByPeriodList.push(
+      new ListSubjectsByPeriod(1, [dataMockResult[0], dataMockResult[1]])
+    );
+
+    subjectByPeriodList.push(
+      new ListSubjectsByPeriod(3, [dataMockResult[2], dataMockResult[3]])
+    );
 
     jest.spyOn(subjectRepository, "find").mockReturnValue(dataMockResult);
 
@@ -199,5 +206,16 @@ describe("SubjectService", () => {
 
     //Assert
     expect(result).toEqual(subjectByPeriodList);
+  });
+
+  it("findGroupedByPeriod => should return not found error", async () => {
+    //Arrange
+    jest.spyOn(subjectRepository, "find").mockReturnValue(null);
+
+    //Act
+    //Assert
+    await expect(subjectService.findAndGroupByPeriod()).rejects.toThrowError(
+      new HttpException("Subject not found", HttpStatus.NOT_FOUND)
+    );
   });
 });

@@ -74,8 +74,6 @@ export class UsersService {
       .withDeleted()
       .getOne();
 
-    console.log(user);
-
     if (user != null) {
       if (user.email === createUserDto.email)
         throw new HttpException(
